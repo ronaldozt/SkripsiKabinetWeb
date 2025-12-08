@@ -337,7 +337,6 @@ document.addEventListener("change", (e) => {
           <div class="k">Umur (Tahun)</div><div class="v">${dispUmur(d)}</div>
 
           <div class="k">Provinsi Lahir</div><div class="v">${disp(d.provinsi_lahir)}</div>
-          <div class="k">Umur Kategori</div><div class="v">${disp(d.umur)}</div>
 
           <div class="k">Partai</div><div class="v">${disp(d.partai)}</div>
           <div class="k">Jabatan Rangkap</div><div class="v">${disp(d.jabatan_rangkap)}</div>
@@ -404,7 +403,6 @@ document.addEventListener("change", (e) => {
       { label:"Tanggal Lahir",   a:leftD.display_tanggal_lahir,b:rightD.display_tanggal_lahir },
       { label:"Umur (Tahun)",    a:dispUmur(leftD),            b:dispUmur(rightD) },
       { label:"Provinsi Lahir",  a:leftD.provinsi_lahir,       b:rightD.provinsi_lahir },
-      { label:"Umur Kategori",   a:leftD.umur,                 b:rightD.umur },
       { label:"Partai",          a:leftD.partai,               b:rightD.partai },
       { label:"Jabatan Rangkap", a:leftD.jabatan_rangkap,      b:rightD.jabatan_rangkap },
       { label:"Karir DPR/MPR",   a:leftD.dpr_mpr,              b:rightD.dpr_mpr },
