@@ -33,7 +33,7 @@
                 class="h-full min-h-0 grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-2 lg:gap-3 items-start relative overflow-hidden"
                 id="umap-layout">
 
-                {{-- LEFT DOCK: DETAIL (lock mode) --}}
+                {{-- LEFT DOCK: DETAIL --}}
                 <aside
                     class="dock-left hidden lg:block sticky top-[92px] h-[calc(100vh-190px)] overflow-hidden rounded-2xl p-3.5 shadow-[0_12px_28px_rgba(15,23,42,0.12)] transition-all duration-[0.18s] border-2"
                     id="dock-left"
