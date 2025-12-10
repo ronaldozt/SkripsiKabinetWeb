@@ -157,6 +157,10 @@ document.addEventListener("change", (e) => {
   const btnExitCompare  = document.getElementById("btnExitCompare");
   const btnResetCompare = document.getElementById("btnResetCompare");
   const btnCloseDetail  = document.getElementById("btnCloseDetail");
+  
+  // Expose ke global scope untuk onclick fallback
+  window.dockLeft = dockLeft;
+  window.layout = layout;
 
   const width  = canvas.clientWidth;
   const height = canvas.clientHeight;
@@ -365,16 +369,24 @@ document.addEventListener("change", (e) => {
   }
 
   function closeDetailDock() {
+    if (!dockLeft) return;
+    
     lockedId = null;
-    dockLeft?.classList.add("dock-left--hidden");
+    
+    // Trigger animasi dengan menambahkan class hidden
+    dockLeft.classList.add("dock-left--hidden");
     layout?.classList.add("umap-layout--onecol");
     hintLocked && (hintLocked.style.display = "none");
 
+    // Reset nodes setelah animasi
     nodes
       .attr("fill", (n, i) => getColor(n, i))
       .attr("r", 5)
       .attr("opacity", 0.9);
   }
+  
+  // Expose ke global scope untuk onclick fallback
+  window.closeDetailDock = closeDetailDock;
 
   // COMPARE DOCK (pakai display_* juga)
   function renderCompareDock() {
@@ -607,7 +619,23 @@ function exitCompareMode() {
   btnResetCompare?.addEventListener("click", resetCompare);
 
   // ===== close detail external button (kalau ada di blade) =====
-  btnCloseDetail?.addEventListener("click", closeDetailDock);
+  if (btnCloseDetail) {
+    btnCloseDetail.addEventListener("click", function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeDetailDock();
+    });
+  }
+  
+  // Fallback: juga attach ke button yang mungkin dibuat dinamis dengan event delegation
+  document.addEventListener("click", function(e) {
+    const target = e.target.closest('#btnCloseDetail');
+    if (target) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeDetailDock();
+    }
+  });
 })();
 
 /* =========================================================
