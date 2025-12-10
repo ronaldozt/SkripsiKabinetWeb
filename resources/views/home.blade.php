@@ -45,20 +45,21 @@
 
                 {{-- RIGHT DOCK: COMPARE (compare mode) --}}
                 <aside class="dock-compare dock-compare--hidden" id="dock-compare">
-                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-                        <div class="fw-bold" style="font-size:clamp(0.9rem, 2vw, 1rem);">Bandingkan Menteri</div>
-                        <div class="text-muted d-none d-sm-block" style="font-size:clamp(0.75rem, 1.8vw, 0.85rem);">Klik 2
-                            titik untuk membandingkan</div>
+                    <div class="dock-compare__header">
+                        <div class="fw-bold" style="font-size:clamp(0.95rem, 2.5vw, 1.1rem);">Bandingkan Menteri</div>
+                        <div class="text-muted d-none d-sm-block"
+                            style="font-size:clamp(0.75rem, 1.8vw, 0.85rem); margin-top:4px;">Klik 2 titik untuk
+                            membandingkan</div>
                     </div>
 
-                    <div id="compareGrid"></div>
+                    <div id="compareGrid" class="dock-compare__content"></div>
 
-                    <div class="d-flex justify-content-end gap-2 mt-3 flex-wrap">
-                        <button id="btnResetCompare" class="btn-pill btn-reset-compare">
+                    <div class="dock-compare__actions">
+                        <button id="btnResetCompare" class="btn-pill btn-reset-compare flex-1 flex-sm-0">
                             <span class="d-none d-sm-inline">Pilih Ulang</span>
                             <span class="d-sm-none">Ulang</span>
                         </button>
-                        <button id="btnExitCompare" class="btn-pill btn-primary">
+                        <button id="btnExitCompare" class="btn-pill btn-primary flex-1 flex-sm-0">
                             <span class="d-none d-sm-inline">Selesai Bandingkan</span>
                             <span class="d-sm-none">Selesai</span>
                         </button>

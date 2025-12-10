@@ -417,19 +417,33 @@ document.addEventListener("change", (e) => {
       { label:"Kekayaan (Rp)",   a:formatRupiah(leftD.display_kekayaan_rp), b:formatRupiah(rightD.display_kekayaan_rp) },
     ];
 
-    const rows = fields.map(f => `
+    // Desktop: 3-column layout (left | label | right)
+    const rowsDesktop = fields.map(f => `
       <div class="compare-cell">${disp(f.a)}</div>
       <div class="compare-label">${f.label}</div>
       <div class="compare-cell">${disp(f.b)}</div>
+    `).join("");
+
+    // Mobile: Card per field with label and side-by-side values
+    const rowsMobile = fields.map(f => `
+      <div class="compare-field-mobile">
+        <div class="compare-label">${f.label}</div>
+        <div class="compare-values-mobile">
+          <div class="compare-cell compare-cell-left">${disp(f.a)}</div>
+          <div class="compare-cell compare-cell-right">${disp(f.b)}</div>
+        </div>
+      </div>
     `).join("");
 
     grid.innerHTML = `
       <div class="compare-wrap">
         <div class="compare-head">
           <div class="compare-side" style="background:${leftColor}">
+            <div class="compare-side-badge">Menteri 1</div>
             <div class="compare-side-inner">
               <img class="compare-photo" src="${leftD.foto_url || ""}" onerror="this.style.display='none'">
-              <div>
+              <div class="compare-info">
+                <div class="compare-side-badge compare-side-badge-mobile">Menteri 1</div>
                 <div class="compare-name">${disp(leftD.nama)}</div>
                 <div class="compare-sub">${disp(leftD.catatan)}</div>
               </div>
@@ -439,9 +453,11 @@ document.addEventListener("change", (e) => {
           <div class="compare-mid"></div>
 
           <div class="compare-side" style="background:${rightColor}">
+            <div class="compare-side-badge">Menteri 2</div>
             <div class="compare-side-inner">
               <img class="compare-photo" src="${rightD.foto_url || ""}" onerror="this.style.display='none'">
-              <div>
+              <div class="compare-info">
+                <div class="compare-side-badge compare-side-badge-mobile">Menteri 2</div>
                 <div class="compare-name">${disp(rightD.nama)}</div>
                 <div class="compare-sub">${disp(rightD.catatan)}</div>
               </div>
@@ -449,8 +465,11 @@ document.addEventListener("change", (e) => {
           </div>
         </div>
 
-        <div class="compare-table">
-          ${rows}
+        <div class="compare-table compare-table-desktop">
+          ${rowsDesktop}
+        </div>
+        <div class="compare-table compare-table-mobile">
+          ${rowsMobile}
         </div>
       </div>
     `;
