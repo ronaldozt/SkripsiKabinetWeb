@@ -1,8 +1,6 @@
 import * as d3 from "d3";
 import tippy from "tippy.js";
 import "tippy.js/dist/tippy.css";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 /* =========================================================
    MASTER LOADER (untuk modal tambah data)
@@ -107,9 +105,9 @@ async function loadMasters() {
       jkWrap.innerHTML = "";
       (m.jenis_kelamin || []).forEach((jk) => {
         const lab = document.createElement("label");
-        lab.className = "badge-soft";
+        lab.className = "inline-flex items-center px-4 py-2.5 rounded-lg border border-gray-300 bg-white cursor-pointer hover:bg-gray-50 transition-colors text-sm font-medium";
         lab.innerHTML = `
-          <input type="radio" name="jenis_kelamin_id" value="${jk.id}" required>
+          <input type="radio" name="jenis_kelamin_id" value="${jk.id}" required class="mr-2 text-primary focus:ring-primary">
           ${jk.label}
         `;
         jkWrap.appendChild(lab);
@@ -132,11 +130,11 @@ document.addEventListener("change", (e) => {
   if (!urlWrap || !fileWrap) return;
 
   if (mode === "file") {
-    urlWrap.classList.add("d-none");
-    fileWrap.classList.remove("d-none");
+    urlWrap.classList.add("hidden");
+    fileWrap.classList.remove("hidden");
   } else {
-    fileWrap.classList.add("d-none");
-    urlWrap.classList.remove("d-none");
+    fileWrap.classList.add("hidden");
+    urlWrap.classList.remove("hidden");
   }
 });
 
@@ -219,7 +217,7 @@ document.addEventListener("change", (e) => {
 
   if (!data.length) {
     canvas.innerHTML =
-      "<div class='text-center p-5 text-muted'>Data UMAP belum tersedia</div>";
+      "<div class='text-center p-5' style='color:var(--muted)'>Data UMAP belum tersedia</div>";
     return;
   }
 
@@ -388,7 +386,8 @@ document.addEventListener("change", (e) => {
       .filter(Boolean);
 
     if (selected.length < 2) {
-      dockCompare?.classList.add("dock-compare--hidden");
+      dockCompare?.classList.add("dock-compare--hidden", "hidden");
+    dockCompare?.classList.remove("flex", "flex-col");
       return;
     }
 
@@ -474,12 +473,14 @@ document.addEventListener("change", (e) => {
       </div>
     `;
 
-    dockCompare?.classList.remove("dock-compare--hidden");
+    dockCompare?.classList.remove("dock-compare--hidden", "hidden");
+    dockCompare?.classList.add("flex", "flex-col");
   }
 
   function resetCompare() {
     compareIds = [];
-    dockCompare?.classList.add("dock-compare--hidden");
+    dockCompare?.classList.add("dock-compare--hidden", "hidden");
+    dockCompare?.classList.remove("flex", "flex-col");
     nodes
       .attr("fill", (n, i) => getColor(n, i))
       .attr("opacity", 0.9)
@@ -499,8 +500,8 @@ document.addEventListener("change", (e) => {
 
   if (btnCompare) {
     btnCompare.textContent = "Mode Compare Aktif";
-    btnCompare.classList.remove("btn-primary");       // biru default
-    btnCompare.classList.add("btn-compare-active");   // hijau aktif
+    btnCompare.classList.remove("bg-primary");
+    btnCompare.classList.add("bg-green-500");
   }
 }
 
@@ -512,8 +513,8 @@ function exitCompareMode() {
 
   if (btnCompare) {
     btnCompare.textContent = "Bandingkan Menteri";
-    btnCompare.classList.remove("btn-compare-active");
-    btnCompare.classList.add("btn-primary");
+    btnCompare.classList.remove("bg-green-500");
+    btnCompare.classList.add("bg-primary");
   }
 
   nodes
@@ -608,3 +609,43 @@ function exitCompareMode() {
   // ===== close detail external button (kalau ada di blade) =====
   btnCloseDetail?.addEventListener("click", closeDetailDock);
 })();
+
+/* =========================================================
+   MODAL FUNCTIONS (Tailwind)
+   Pastikan fungsi tersedia di global scope untuk inline onclick
+========================================================= */
+window.openModal = function(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex", "items-center", "justify-center");
+    document.body.style.overflow = "hidden";
+  }
+};
+
+window.closeModal = function(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex", "items-center", "justify-center");
+    document.body.style.overflow = "";
+  }
+};
+
+window.closeModalOnBackdrop = function(event, modalId) {
+  if (event.target.id === modalId) {
+    window.closeModal(modalId);
+  }
+};
+
+// ESC key untuk close modal
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    const modals = document.querySelectorAll("[id^='modal']");
+    modals.forEach((modal) => {
+      if (!modal.classList.contains("hidden")) {
+        window.closeModal(modal.id);
+      }
+    });
+  }
+});

@@ -2,39 +2,42 @@
 @section('title', 'Bandingkan Menteri')
 
 @section('content')
-    <section class="glass p-3 p-sm-4 mb-3" x-data="{ compareMode: false }">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <section class="bg-white border border-stroke rounded-xl p-3 sm:p-4 mb-3 shadow-sm" x-data="{ compareMode: false }">
+        <div class="flex items-center justify-between flex-wrap gap-2">
             <div>
-                <h2 class="h4 fw-bold mb-1" style="font-size:clamp(1.1rem, 3vw, 1.5rem);">Bandingkan Menteri</h2>
-                <p class="mb-0 d-none d-sm-block" style="color:var(--muted);font-size:clamp(0.85rem, 2vw, 1rem);">Aktifkan
+                <h2 class="font-bold mb-1 m-0" style="font-size:clamp(1.1rem, 3vw, 1.5rem);">Bandingkan Menteri</h2>
+                <p class="mb-0 hidden sm:block m-0" style="color:var(--muted);font-size:clamp(0.85rem, 2vw, 1rem);">Aktifkan
                     mode untuk pilih 2 menteri.</p>
-                <small x-show="compareMode" class="badge-soft mt-2 d-inline-block">
+                <small x-show="compareMode" class="badge-soft mt-2 inline-block">
                     Mode Bandingkan Aktif
                 </small>
             </div>
-            <button class="btn-genz btn-pill btn-primary"
+            <button
+                class="rounded-full bg-primary text-white px-4 sm:px-5 py-2.5 sm:py-3 font-bold text-sm sm:text-base border-0 transition-all hover:brightness-110 shadow-sm"
                 @click="compareMode = !compareMode; window.setCompareMode(compareMode)">
-                <span x-text="compareMode ? 'Matikan Bandingkan' : 'Bandingkan Menteri'" class="d-none d-sm-inline"></span>
-                <span x-text="compareMode ? 'Matikan' : 'Bandingkan'" class="d-sm-none"></span>
+                <span x-text="compareMode ? 'Matikan Bandingkan' : 'Bandingkan Menteri'" class="hidden sm:inline"></span>
+                <span x-text="compareMode ? 'Matikan' : 'Bandingkan'" class="sm:hidden"></span>
             </button>
         </div>
     </section>
 
-    <section class="glass p-2 p-sm-3 position-relative mb-3" style="min-height:400px;">
+    <section class="bg-white border border-stroke rounded-xl p-2 sm:p-3 relative mb-3 shadow-sm" style="min-height:400px;">
         <div id="umap-canvas" style="width:100%;height:100%;min-height:400px;"></div>
     </section>
 
-    <section id="compare-cards" class="d-none">
-        <div class="compare-wrap d-flex flex-column flex-md-row gap-3">
-            <div id="card-left" class="glass p-3 info-card flex-1"></div>
-            <div id="card-right" class="glass p-3 info-card flex-1"></div>
+    <section id="compare-cards" class="hidden">
+        <div class="flex flex-col md:flex-row gap-3">
+            <div id="card-left" class="bg-white border border-stroke rounded-xl p-3 flex-1 shadow-sm"></div>
+            <div id="card-right" class="bg-white border border-stroke rounded-xl p-3 flex-1 shadow-sm"></div>
         </div>
         <div class="text-center mt-3">
-            <button class="btn btn-outline-light rounded-pill px-3 px-sm-4" onclick="window.resetCompare()">
-                <span class="d-none d-sm-inline">Banding Ulang</span>
-                <span class="d-sm-none">Ulang</span>
+            <button
+                class="rounded-full border border-gray-300 bg-white text-gray-700 px-3 sm:px-4 py-2 text-sm sm:text-base transition-all hover:bg-gray-50"
+                onclick="window.resetCompare()">
+                <span class="hidden sm:inline">Banding Ulang</span>
+                <span class="sm:hidden">Ulang</span>
             </button>
-            <div class="compare-sync-note d-none d-sm-block mt-2" style="font-size:0.85rem;color:var(--muted);">Scroll salah
+            <div class="hidden sm:block mt-2 text-sm" style="color:var(--muted);">Scroll salah
                 satu kartu → keduanya bergerak bareng</div>
         </div>
     </section>

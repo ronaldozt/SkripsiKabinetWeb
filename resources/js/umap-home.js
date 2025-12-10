@@ -221,14 +221,14 @@ import { renderCompareHTML } from "./umap-compare";
 
     if (next === "default"){
       modeHint.textContent = "Hover titik → lihat ringkas. Klik titik → kunci & scroll detail.";
-      btnCompareMode?.classList.remove("btn-primary");
-      btnCompareMode?.classList.add("btn-outline");
+      btnCompareMode?.classList.remove("bg-primary");
+      btnCompareMode?.classList.add("bg-white", "border", "border-gray-300", "text-gray-700");
     }
     if (next === "compare"){
       modeHint.textContent = "Mode Bandingkan aktif. Pilih 2 menteri di peta.";
       compareBanner?.classList.remove("hidden");
-      btnCompareMode?.classList.add("btn-primary");
-      btnCompareMode?.classList.remove("btn-outline");
+      btnCompareMode?.classList.add("bg-primary", "text-white");
+      btnCompareMode?.classList.remove("bg-white", "border", "border-gray-300", "text-gray-700");
       compareStepText.textContent = "Mode Bandingkan: pilih menteri pertama.";
     }
     if (next === "insert"){
