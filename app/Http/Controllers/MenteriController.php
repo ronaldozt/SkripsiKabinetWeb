@@ -127,6 +127,18 @@ class MenteriController extends Controller
             // tetap lanjut redirect, biar user gak error
         }
 
+        // Return JSON untuk AJAX request
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil ditambahkan dan UMAP sudah diperbarui.',
+                'data' => [
+                    'id' => $menteri->id,
+                    'nama' => $menteri->nama,
+                ]
+            ]);
+        }
+
         return redirect('/')
             ->with('success', 'Data berhasil ditambahkan dan UMAP sudah diperbarui.');
     }

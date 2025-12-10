@@ -120,6 +120,13 @@ class MenteriController extends Controller
 
                 'display_kekayaan_rp'  => $det->kekayaan_rp ?? null,
                 'display_status_hukum' => $det->status_hukum ?? null,
+
+                // =========================
+                // USER INPUT FLAG
+                // =========================
+                'is_user_input' => !empty($m->submitted_by_ip) || !empty($m->user_id),
+                'submitted_by_ip' => $m->submitted_by_ip ?? null,
+                'user_id' => $m->user_id ?? null,
             ];
         });
     }
