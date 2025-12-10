@@ -6,14 +6,14 @@
 @section('admin-content')
 <div class="row g-3">
 
-  <div class="col-lg-4">
+  <div class="col-lg-4 col-md-12 mb-3 mb-lg-0">
     <div class="admin-card">
       <div class="fw-bold mb-2">Preview Foto</div>
       <img id="photoPreview"
            src="{{ $menteri->foto_path }}"
            onerror="this.style.display='none'"
            style="width:100%;height:260px;object-fit:cover;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#0b1226;">
-      <div class="text-muted mt-2" style="font-size:.85rem;color:#94a3b8;">
+      <div class="text-muted mt-2 d-none d-md-block" style="font-size:.85rem;color:#94a3b8;">
         Ganti URL foto di form kanan untuk update preview.
       </div>
     </div>
@@ -316,12 +316,13 @@
 
         </div>
 
-        <div class="sticky-actions mt-3 d-flex gap-2">
-          <button class="btn btn-info fw-bold rounded-pill px-4 text-dark" type="submit">
-            Simpan Perubahan
+        <div class="sticky-actions mt-3 d-flex gap-2 flex-wrap">
+          <button class="btn btn-info fw-bold rounded-pill px-3 px-sm-4 text-dark flex-1 flex-sm-0" type="submit">
+            <span class="d-none d-sm-inline">Simpan Perubahan</span>
+            <span class="d-sm-none">Simpan</span>
           </button>
           <a href="{{ route('admin.aplikasi.index') }}"
-             class="btn btn-outline-light fw-bold rounded-pill px-4">
+             class="btn btn-outline-light fw-bold rounded-pill px-3 px-sm-4 flex-1 flex-sm-0">
             Batal
           </a>
         </div>

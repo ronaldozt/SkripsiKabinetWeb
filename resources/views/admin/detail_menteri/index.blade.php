@@ -13,9 +13,17 @@
 
     <input id="searchBox" type="text"
            class="form-control form-control-sm"
-           style="max-width:260px"
+           style="max-width:100%;width:100%;"
            placeholder="Cari nama menteri...">
   </div>
+  <style>
+    @media (min-width: 576px){
+      #searchBox{
+        max-width:260px !important;
+        width:auto !important;
+      }
+    }
+  </style>
 
   <div class="table-responsive" style="overflow-x:auto;">
     <table class="table table-admin table-hover align-middle" style="min-width:1700px;">
