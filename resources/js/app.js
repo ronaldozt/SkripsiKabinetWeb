@@ -996,4 +996,89 @@ document.addEventListener("DOMContentLoaded", function () {
             submitBtn.innerHTML = originalText;
         }
     });
+
+    // ===== UMAP CONFIG FORM HANDLER =====
+    const formUmapConfig = document.getElementById("formUmapConfig");
+    if (formUmapConfig) {
+        formUmapConfig.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const submitBtn = formUmapConfig.querySelector(
+                'button[type="submit"]'
+            );
+            const originalText = submitBtn.innerHTML;
+
+            // Disable button dan show loading
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <svg class="animate-spin w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Memproses...
+            `;
+
+            try {
+                const formData = new FormData(formUmapConfig);
+                const params = {
+                    nComponents: parseInt(formData.get("nComponents")),
+                    nNeighbors: parseInt(formData.get("nNeighbors")),
+                    minDist: parseFloat(formData.get("minDist")),
+                    randomState: parseInt(formData.get("randomState")),
+                };
+
+                // Get CSRF token
+                const csrfToken =
+                    document
+                        .querySelector('meta[name="csrf-token"]')
+                        ?.getAttribute("content") || "";
+
+                const response = await fetch("/api/umap/update-config", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": csrfToken,
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                    body: JSON.stringify(params),
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showToast(
+                        "success",
+                        "Berhasil!",
+                        result.message ||
+                            "UMAP berhasil di-recompute dengan parameter baru.",
+                        5000
+                    );
+                    window.closeModal("modalUmapConfig");
+
+                    // Reload page setelah 2 detik untuk refresh data
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    showToast(
+                        "error",
+                        "Gagal!",
+                        result.message || "Gagal update parameter UMAP",
+                        7000
+                    );
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            } catch (error) {
+                console.error("UMAP config error:", error);
+                showToast(
+                    "error",
+                    "Error!",
+                    "Terjadi kesalahan saat update parameter. Periksa koneksi internet Anda.",
+                    7000
+                );
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+    }
 });

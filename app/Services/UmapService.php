@@ -73,8 +73,13 @@ class UmapService
         return 0;
     }
 
-    public function recomputeAll(string $batchTag = null): void
-    {
+    public function recomputeAll(
+        string $batchTag = null,
+        int $nComponents = 2,
+        int $nNeighbors = 10,
+        float $minDist = 0.1,
+        int $randomState = 42
+    ): void {
         $batchTag = $batchTag ?? ('v' . now()->format('Ymd_His'));
 
         $menteris = Menteri::with([
@@ -128,7 +133,11 @@ class UmapService
         $cmd = escapeshellarg($nodeBin)
             . ' ' . escapeshellarg($scriptPath)
             . ' ' . escapeshellarg($inputPath)
-            . ' ' . escapeshellarg($outputPath);
+            . ' ' . escapeshellarg($outputPath)
+            . ' ' . escapeshellarg((string)$nComponents)
+            . ' ' . escapeshellarg((string)$nNeighbors)
+            . ' ' . escapeshellarg((string)$minDist)
+            . ' ' . escapeshellarg((string)$randomState);
 
         $descriptorspec = [
             0 => ["pipe", "r"],

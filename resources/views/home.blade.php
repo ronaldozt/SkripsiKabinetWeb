@@ -23,6 +23,12 @@
                         <span class="hidden sm:inline">Masukkan Dataku</span>
                         <span class="sm:hidden">Tambah Data</span>
                     </button>
+                    <button id="btnUmapConfig"
+                        class="rounded-full bg-purple-500 text-white flex-1 sm:flex-none whitespace-nowrap px-3.5 sm:px-5 py-2.5 sm:py-3.5 font-bold sm:font-extrabold text-sm sm:text-base border-0 no-underline transition-all duration-200 inline-flex items-center justify-center cursor-pointer gap-1.5 min-h-10 sm:min-h-0 shadow-[0_1px_3px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_6px_16px_rgba(139,92,246,0.3),0_3px_6px_rgba(139,92,246,0.2)] active:scale-[0.98] active:translate-y-0"
+                        type="button" onclick="openModal('modalUmapConfig')">
+                        <span class="hidden sm:inline">Parameter UMAP</span>
+                        <span class="sm:hidden">Parameter</span>
+                    </button>
                 </div>
             </div>
         </header>
@@ -152,8 +158,8 @@
                     </button>
                 </div>
 
-                <form id="formAddData" method="POST" action="{{ route('menteri.store') }}" enctype="multipart/form-data"
-                    class="flex flex-col min-h-0 flex-1">
+                <form id="formAddData" method="POST" action="{{ route('menteri.store') }}"
+                    enctype="multipart/form-data" class="flex flex-col min-h-0 flex-1">
                     @csrf
 
                     <div class="overflow-y-auto flex-1 bg-gray-50/30 min-h-0 flex-shrink">
@@ -431,6 +437,91 @@
                         </button>
                     </div>
 
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- ===================== MODAL UMAP CONFIG ===================== --}}
+    <div id="modalUmapConfig" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm overflow-y-auto"
+        onclick="closeModalOnBackdrop(event, 'modalUmapConfig')">
+        <div class="w-full max-w-md mx-auto my-8 flex items-center py-4" onclick="event.stopPropagation()">
+            <div class="bg-white rounded-xl sm:rounded-2xl overflow-hidden flex flex-col w-full shadow-2xl">
+                {{-- Header --}}
+                <div
+                    class="px-5 sm:px-6 py-4 sm:py-5 flex items-center justify-between border-b border-gray-200 bg-gray-50/50">
+                    <div>
+                        <h5 class="font-bold text-lg sm:text-xl m-0 text-gray-900">Ubah Parameter UMAP</h5>
+                        <p class="text-xs sm:text-sm text-gray-500 mt-1 m-0">Ubah parameter algoritma UMAP untuk
+                            visualisasi yang berbeda</p>
+                    </div>
+                    <button type="button"
+                        class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors duration-200 text-gray-500 hover:text-gray-700"
+                        onclick="closeModal('modalUmapConfig')" aria-label="Close">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Form --}}
+                <form id="formUmapConfig" class="px-5 sm:px-6 py-5 sm:py-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
+                                nComponents <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" name="nComponents" value="2" min="2" max="3"
+                                required
+                                class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+                            <p class="text-xs text-gray-500 mt-1">Dimensi output (2 atau 3)</p>
+                        </div>
+
+                        <div>
+                            <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
+                                nNeighbors <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" name="nNeighbors" value="10" min="2" max="200"
+                                required
+                                class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+                            <p class="text-xs text-gray-500 mt-1">Jumlah tetangga untuk local structure (2-200)</p>
+                        </div>
+
+                        <div>
+                            <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
+                                minDist <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" name="minDist" value="0.1" min="0" max="1"
+                                step="0.1" required
+                                class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+                            <p class="text-xs text-gray-500 mt-1">Jarak minimum antar titik (0.0-1.0, lebih kecil = lebih
+                                rapat)</p>
+                        </div>
+
+                        <div>
+                            <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
+                                randomState <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" name="randomState" value="42" min="0" required
+                                class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+                            <p class="text-xs text-gray-500 mt-1">Seed untuk random generator (0 atau lebih, untuk hasil
+                                konsisten)</p>
+                        </div>
+                    </div>
+
+                    {{-- Footer Actions --}}
+                    <div class="flex gap-3 justify-end mt-6 pt-4 border-t border-gray-200">
+                        <button type="button" onclick="closeModal('modalUmapConfig')"
+                            class="rounded-full bg-white text-gray-700 border-2 border-gray-300 px-5 py-3 font-semibold text-sm sm:text-base transition-all hover:border-gray-400 hover:bg-gray-50">
+                            Batal
+                        </button>
+                        <button type="submit"
+                            class="rounded-full bg-purple-500 text-white px-5 py-3 font-semibold text-sm sm:text-base border-0 transition-all shadow-[0_4px_12px_rgba(139,92,246,0.25)] hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_6px_16px_rgba(139,92,246,0.35)] active:scale-[0.98]">
+                            Update & Recompute
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\MenteriController;
+use App\Http\Controllers\Api\UmapConfigController;
 
 // admin controllers
 use App\Http\Controllers\Admin\AuthController;
@@ -24,7 +25,11 @@ Route::get('/bandingkan', [CompareController::class,'index'])->name('compare');
 // kalau masih dipakai (optional, bisa kamu hapus nanti)
 Route::get('/tambah-menteri', [MenteriController::class,'create'])->name('menteri.create');
 Route::post('/tambah-menteri', [MenteriController::class,'store'])->name('menteri.store');
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+
+// API untuk update UMAP config
+Route::post('/api/umap/update-config', [UmapConfigController::class, 'update'])->name('api.umap.update-config');
+
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 
 /*
 |--------------------------------------------------------------------------
