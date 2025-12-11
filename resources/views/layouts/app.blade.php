@@ -11,18 +11,6 @@
 
 <body>
 
-    <nav class="w-full px-2 sm:px-3 py-1 sm:py-2 bg-transparent">
-        <div class="w-full flex items-center justify-between">
-            <a class="font-bold text-[clamp(0.9rem,2.5vw,1.1rem)] no-underline" href="{{ route('home') }}">
-                <span style="color:var(--accent2)">UMAP</span> <span class="hidden sm:inline">Menteri</span>
-            </a>
-            <div class="flex gap-2 ml-auto">
-                {{-- <a class="text-sm px-3 py-1.5 rounded-full border border-white/30 text-white hover:bg-white/10 transition" href="{{ route('compare') }}">Bandingkan</a>
-      <a class="text-sm px-3 py-1.5 rounded-full bg-white text-gray-900 hover:bg-gray-100 transition" href="{{ route('menteri.create') }}">Tambah Data</a> --}}
-            </div>
-        </div>
-    </nav>
-
     <main class="w-full px-2 sm:px-3 lg:px-4 pb-4 sm:pb-5">
         @yield('content')
     </main>
