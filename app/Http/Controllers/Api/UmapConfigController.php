@@ -11,7 +11,6 @@ class UmapConfigController extends Controller
     public function update(Request $request, UmapService $umapService)
     {
         $validated = $request->validate([
-            'nComponents' => 'required|integer|min:2|max:3',
             'nNeighbors' => 'required|integer|min:2|max:200',
             'minDist' => 'required|numeric|min:0|max:1',
             'randomState' => 'required|integer|min:0',
@@ -20,7 +19,7 @@ class UmapConfigController extends Controller
         try {
             $umapService->recomputeAll(
                 null,
-                $validated['nComponents'],
+                2,
                 $validated['nNeighbors'],
                 $validated['minDist'],
                 $validated['randomState']

@@ -82,6 +82,9 @@ class UmapService
     ): void {
         $batchTag = $batchTag ?? ('v' . now()->format('Ymd_His'));
 
+        // Selalu 2D untuk visualisasi; abaikan input nComponents lain.
+        $nComponents = 2;
+
         $menteris = Menteri::with([
             'jenisKelamin','provinsiLahir','umurKategori',
             'partai','jabatanRangkap','dprMpr','militerPolisi',

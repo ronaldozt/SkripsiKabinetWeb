@@ -469,14 +469,8 @@
                 {{-- Form --}}
                 <form id="formUmapConfig" class="px-5 sm:px-6 py-5 sm:py-6">
                     <div class="space-y-4">
-                        <div>
-                            <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
-                                nComponents <span class="text-red-500">*</span>
-                            </label>
-                            <input type="number" name="nComponents" value="2" min="2" max="3"
-                                required
-                                class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none">
-                            <p class="text-xs text-gray-500 mt-1">Dimensi output (2 atau 3)</p>
+                        <div class="p-3 rounded-lg bg-gray-50 border border-gray-200 text-sm text-gray-700">
+                            Dimensi visualisasi dikunci ke 2D (n_components = 2) untuk tampilan peta yang konsisten.
                         </div>
 
                         <div>
@@ -486,7 +480,12 @@
                             <input type="number" name="nNeighbors" value="10" min="2" max="200"
                                 required
                                 class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none">
-                            <p class="text-xs text-gray-500 mt-1">Jumlah tetangga untuk local structure (2-200)</p>
+                            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+                                n_neighbors (Mengatur “Skala Struktur”):
+                                <br>5–15 = Memisahkan “Elite Bisnis”, “Legislator Senior”, “Teknokrat Nonpartai”, dsb
+                                <br>20–50 = Menangkap pola besar kabinet (misal: dominasi nonpartai)
+                                <br>80–150 = Menunjukkan hubungan antar kluster
+                            </p>
                         </div>
 
                         <div>
@@ -496,8 +495,12 @@
                             <input type="number" name="minDist" value="0.1" min="0" max="1"
                                 step="0.1" required
                                 class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none">
-                            <p class="text-xs text-gray-500 mt-1">Jarak minimum antar titik (0.0-1.0, lebih kecil = lebih
-                                rapat)</p>
+                            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+                                min_dist (Seberapa Dekat Titik Boleh Menggumpal):
+                                <br>0.0–0.1 = Identitas tipologi tajam (mis. Legislator Senior vs Elite Bisnis)
+                                <br>0.3–0.5 = Spasi visual antar-titik agar mudah dibaca
+                                <br>0.6–0.9 = Menunjukkan transisi/gradien posisi (mis. teknokrat → elite bisnis)
+                            </p>
                         </div>
 
                         <div>
@@ -506,8 +509,11 @@
                             </label>
                             <input type="number" name="randomState" value="42" min="0" required
                                 class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none">
-                            <p class="text-xs text-gray-500 mt-1">Seed untuk random generator (0 atau lebih, untuk hasil
-                                konsisten)</p>
+                            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+                                Seed untuk random generator (0 atau lebih). Default 42 untuk hasil konsisten;
+                                ubah hanya jika ingin variasi. spread + random_state mengatur bentuk & stabilitas
+                                visualisasi.
+                            </p>
                         </div>
                     </div>
 

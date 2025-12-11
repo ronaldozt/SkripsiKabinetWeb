@@ -10,11 +10,12 @@ const rows = JSON.parse(fs.readFileSync(inputPath, "utf8"));
 const features = rows.map((r) => r.features);
 
 // Parameter UMAP dari command line (opsional, default seperti sebelumnya)
-// Format: node run-umap.js input.json output.json nComponents nNeighbors minDist randomState
-const nComponents = parseInt(process.argv[4]) || 2;
-const nNeighbors = parseInt(process.argv[5]) || 10;
-const minDist = parseFloat(process.argv[6]) || 0.1;
-const randomState = parseInt(process.argv[7]) || 42;
+// Format: node run-umap.js input.json output.json nNeighbors minDist randomState
+// Dimensi kita kunci ke 2D untuk visualisasi.
+const nComponents = 2;
+const nNeighbors = parseInt(process.argv[4]) || 10;
+const minDist = parseFloat(process.argv[5]) || 0.1;
+const randomState = parseInt(process.argv[6]) || 42;
 
 // Config UMAP dengan parameter dinamis
 const umap = new UMAP({
