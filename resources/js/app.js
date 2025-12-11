@@ -767,7 +767,17 @@ document.addEventListener("change", (e) => {
         .attr("r", 5)
         .attr("fill", (d, i) => getColor(d, i))
         .attr("opacity", 0.9)
-        .style("cursor", "pointer");
+        .style("cursor", "pointer")
+        .classed("dot-user", (d) => {
+            // Check berbagai kemungkinan flag untuk user input
+            return (
+                d.is_user_input === true ||
+                d.is_user_input === 1 ||
+                d.source === "user" ||
+                d.submitted_by_ip !== null ||
+                d.user_id !== null
+            );
+        });
 
     nodes
         .on("mouseenter", function (event, d) {
@@ -904,6 +914,241 @@ document.addEventListener("keydown", (e) => {
         modals.forEach((modal) => {
             if (!modal.classList.contains("hidden")) {
                 window.closeModal(modal.id);
+            }
+        });
+    }
+});
+
+/* =========================================================
+   TOAST NOTIFICATION FUNCTIONS
+========================================================= */
+function createToastContainer() {
+    let container = document.getElementById("toast-container");
+    if (!container) {
+        container = document.createElement("div");
+        container.id = "toast-container";
+        container.className = "toast-container";
+        document.body.appendChild(container);
+    }
+    return container;
+}
+
+function showToast(type, title, message, duration = 5000) {
+    const container = createToastContainer();
+
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
+
+    const iconSvg =
+        type === "success"
+            ? '<svg class="toast-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>'
+            : '<svg class="toast-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+
+    toast.innerHTML = `
+    ${iconSvg}
+    <div class="toast-content">
+      <div class="toast-title">${title}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+    <button class="toast-close" onclick="this.parentElement.remove()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  `;
+
+    container.appendChild(toast);
+
+    // Auto remove setelah duration
+    setTimeout(() => {
+        toast.style.animation = "toast-slide-in 0.3s ease-out reverse";
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+
+    return toast;
+}
+
+/* =========================================================
+   FORM SUBMIT HANDLER
+========================================================= */
+document.addEventListener("DOMContentLoaded", function () {
+    const formAddData = document.getElementById("formAddData");
+    if (!formAddData) return;
+
+    formAddData.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const submitBtn = formAddData.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+
+        // Disable button dan show loading
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+      <svg class="animate-spin w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+      </svg>
+      Menyimpan...
+    `;
+
+        try {
+            const formData = new FormData(formAddData);
+
+            const response = await fetch(formAddData.action, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            });
+
+            if (response.ok) {
+                const result = await response.json().catch(() => null);
+
+                // Success toast
+                showToast(
+                    "success",
+                    "Berhasil!",
+                    result?.message ||
+                        "Data berhasil ditambahkan dan UMAP sudah diperbarui.",
+                    6000
+                );
+
+                // Close modal
+                window.closeModal("modalAddData");
+
+                // Reset form
+                formAddData.reset();
+
+                // Reload page setelah 1.5 detik untuk refresh data
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                // Handle error response
+                let errorMessage = "Gagal menyimpan data. Silakan coba lagi.";
+
+                try {
+                    const errorData = await response.json();
+                    if (errorData.message) {
+                        errorMessage = errorData.message;
+                    } else if (errorData.errors) {
+                        const firstError = Object.values(errorData.errors)[0];
+                        errorMessage = Array.isArray(firstError)
+                            ? firstError[0]
+                            : firstError;
+                    }
+                } catch (e) {
+                    // Jika response bukan JSON, gunakan status text
+                    errorMessage = response.statusText || errorMessage;
+                }
+
+                showToast("error", "Gagal!", errorMessage, 7000);
+
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        } catch (error) {
+            console.error("Form submit error:", error);
+            showToast(
+                "error",
+                "Error!",
+                "Terjadi kesalahan saat menyimpan data. Periksa koneksi internet Anda.",
+                7000
+            );
+
+            // Re-enable button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    });
+
+    // ===== UMAP CONFIG FORM HANDLER =====
+    const formUmapConfig = document.getElementById("formUmapConfig");
+    if (formUmapConfig) {
+        formUmapConfig.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const submitBtn = formUmapConfig.querySelector(
+                'button[type="submit"]'
+            );
+            const originalText = submitBtn.innerHTML;
+
+            // Disable button dan show loading
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+        <svg class="animate-spin w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        Memproses...
+      `;
+
+            try {
+                const formData = new FormData(formUmapConfig);
+                const payload = {
+                    nNeighbors: parseInt(formData.get("nNeighbors")),
+                    minDist: parseFloat(formData.get("minDist")),
+                    randomState: parseInt(formData.get("randomState")),
+                };
+
+                const response = await fetch("/api/umap/update-config", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRF-TOKEN":
+                            document
+                                .querySelector('meta[name="csrf-token"]')
+                                ?.getAttribute("content") || "",
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (response.ok) {
+                    const result = await response.json().catch(() => null);
+
+                    showToast(
+                        "success",
+                        "Berhasil!",
+                        result?.message ||
+                            "Parameter UMAP berhasil diperbarui. Visualisasi akan di-recompute.",
+                        6000
+                    );
+
+                    window.closeModal("modalUmapConfig");
+
+                    // Reload setelah 2 detik untuk refresh visualisasi
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    let errorMessage = "Gagal memperbarui parameter UMAP.";
+
+                    try {
+                        const errorData = await response.json();
+                        if (errorData.message) {
+                            errorMessage = errorData.message;
+                        }
+                    } catch (e) {
+                        errorMessage = response.statusText || errorMessage;
+                    }
+
+                    showToast("error", "Gagal!", errorMessage, 7000);
+
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            } catch (error) {
+                console.error("UMAP config submit error:", error);
+                showToast(
+                    "error",
+                    "Error!",
+                    "Terjadi kesalahan saat memperbarui parameter. Periksa koneksi internet Anda.",
+                    7000
+                );
+
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
             }
         });
     }
