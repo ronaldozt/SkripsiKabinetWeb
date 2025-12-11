@@ -1066,6 +1066,70 @@ document.addEventListener("DOMContentLoaded", function () {
     // ===== UMAP CONFIG FORM HANDLER =====
     const formUmapConfig = document.getElementById("formUmapConfig");
     if (formUmapConfig) {
+        // Load saved parameters dari localStorage saat form dibuka
+        const loadSavedParams = () => {
+            try {
+                const saved = localStorage.getItem("umap_params");
+                if (saved) {
+                    const params = JSON.parse(saved);
+                    const nNeighborsInput = formUmapConfig.querySelector(
+                        'input[name="nNeighbors"]'
+                    );
+                    const minDistInput = formUmapConfig.querySelector(
+                        'input[name="minDist"]'
+                    );
+                    const randomStateInput = formUmapConfig.querySelector(
+                        'input[name="randomState"]'
+                    );
+
+                    if (nNeighborsInput && params.nNeighbors) {
+                        nNeighborsInput.value = params.nNeighbors;
+                    }
+                    if (minDistInput && params.minDist !== undefined) {
+                        minDistInput.value = params.minDist;
+                    }
+                    if (randomStateInput && params.randomState !== undefined) {
+                        randomStateInput.value = params.randomState;
+                    }
+                }
+            } catch (e) {
+                console.error("Error loading saved UMAP params:", e);
+            }
+        };
+
+        // Load saat form dibuka (via modal open)
+        const modalUmapConfig = document.getElementById("modalUmapConfig");
+        if (modalUmapConfig) {
+            // Observer untuk detect ketika modal dibuka
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (
+                        mutation.type === "attributes" &&
+                        mutation.attributeName === "class"
+                    ) {
+                        const isHidden =
+                            modalUmapConfig.classList.contains("hidden");
+                        if (!isHidden) {
+                            loadSavedParams();
+                        }
+                    }
+                });
+            });
+            observer.observe(modalUmapConfig, {
+                attributes: true,
+                attributeFilter: ["class"],
+            });
+        }
+
+        // Load juga saat DOM ready (dengan delay kecil untuk pastikan form sudah render)
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", () => {
+                setTimeout(loadSavedParams, 100);
+            });
+        } else {
+            setTimeout(loadSavedParams, 100);
+        }
+
         formUmapConfig.addEventListener("submit", async function (e) {
             e.preventDefault();
 
@@ -1090,6 +1154,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     minDist: parseFloat(formData.get("minDist")),
                     randomState: parseInt(formData.get("randomState")),
                 };
+
+                // Simpan ke localStorage sebelum submit
+                localStorage.setItem("umap_params", JSON.stringify(payload));
 
                 const response = await fetch("/api/umap/update-config", {
                     method: "POST",
