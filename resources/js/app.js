@@ -376,6 +376,38 @@ document.addEventListener("change", (e) => {
 
         // set accent buat css dock putih + border warna
         dockLeft.style.setProperty("--dock-accent", color);
+        const isMobile = window.innerWidth < 1024; // < lg breakpoint
+        // Tampilkan dock: di mobile sebagai overlay full, di desktop tetap di tempatnya
+        dockLeft.classList.remove("hidden");
+        dockLeft.classList.remove("dock-left--hidden");
+        if (isMobile) {
+            dockLeft.dataset.mobileActive = "1";
+            dockLeft.style.position = "fixed";
+            dockLeft.style.inset = "0";
+            dockLeft.style.zIndex = "50";
+            dockLeft.style.maxHeight = "100vh";
+            dockLeft.style.overflowY = "auto";
+            dockLeft.style.margin = "0";
+            dockLeft.style.width = "100%";
+            dockLeft.style.borderRadius = "0";
+            dockLeft.style.border = "none";
+            dockLeft.style.padding = "16px";
+            dockLeft.style.background =
+                dockLeft.style.getPropertyValue("--dock-accent") || "#00a3ff";
+        } else {
+            dockLeft.dataset.mobileActive = "0";
+            dockLeft.style.position = "";
+            dockLeft.style.inset = "";
+            dockLeft.style.zIndex = "";
+            dockLeft.style.maxHeight = "";
+            dockLeft.style.overflowY = "";
+            dockLeft.style.margin = "";
+            dockLeft.style.width = "";
+            dockLeft.style.borderRadius = "";
+            dockLeft.style.border = "";
+            dockLeft.style.padding = "";
+            dockLeft.style.background = "";
+        }
 
         dockLeft.innerHTML = `
       <div class="detail-head">
@@ -465,8 +497,23 @@ document.addEventListener("change", (e) => {
 
         // Trigger animasi dengan menambahkan class hidden
         dockLeft.classList.add("dock-left--hidden");
+        dockLeft.classList.add("hidden");
         layout?.classList.add("umap-layout--onecol");
         hintLocked && (hintLocked.style.display = "none");
+
+        // Reset styling overlay mobile
+        dockLeft.dataset.mobileActive = "0";
+        dockLeft.style.position = "";
+        dockLeft.style.inset = "";
+        dockLeft.style.zIndex = "";
+        dockLeft.style.maxHeight = "";
+        dockLeft.style.overflowY = "";
+        dockLeft.style.margin = "";
+        dockLeft.style.width = "";
+        dockLeft.style.borderRadius = "";
+        dockLeft.style.border = "";
+        dockLeft.style.padding = "";
+        dockLeft.style.background = "";
 
         // Reset nodes setelah animasi
         nodes
