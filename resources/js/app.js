@@ -621,13 +621,30 @@ document.addEventListener("change", (e) => {
             },
         ];
 
+        const renderCell = (value, badge, colorHex) => `
+      <div class="compare-cell" style="display:flex;flex-direction:column;gap:6px;">
+        <span class="compare-badge" style="
+          display:inline-block;
+          align-self:flex-start;
+          padding:4px 10px;
+          border-radius:9999px;
+          background:${colorHex || "#0ea5e9"};
+          color:#fff;
+          font-weight:700;
+          font-size:.72rem;
+          letter-spacing:0.02em;
+        ">${badge}</span>
+        <div class="compare-value">${disp(value)}</div>
+      </div>
+    `;
+
         // Desktop: 3-column layout (left | label | right)
         const rowsDesktop = fields
             .map(
                 (f) => `
-      <div class="compare-cell">${disp(f.a)}</div>
+      ${renderCell(f.a, "Menteri 1", leftColor)}
       <div class="compare-label">${f.label}</div>
-      <div class="compare-cell">${disp(f.b)}</div>
+      ${renderCell(f.b, "Menteri 2", rightColor)}
     `
             )
             .join("");
@@ -639,8 +656,8 @@ document.addEventListener("change", (e) => {
       <div class="compare-field-mobile">
         <div class="compare-label">${f.label}</div>
         <div class="compare-values-mobile">
-          <div class="compare-cell compare-cell-left">${disp(f.a)}</div>
-          <div class="compare-cell compare-cell-right">${disp(f.b)}</div>
+          ${renderCell(f.a, "Menteri 1", leftColor)}
+          ${renderCell(f.b, "Menteri 2", rightColor)}
         </div>
       </div>
     `
