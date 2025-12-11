@@ -1,0 +1,546 @@
+diff --git a/.DS_Store b/.DS_Store
+new file mode 100644
+index 0000000..5273125
+Binary files /dev/null and b/.DS_Store differ
+diff --git a/app.zip b/app.zip
+deleted file mode 100644
+index 6f39efb..0000000
+Binary files a/app.zip and /dev/null differ
+diff --git a/app/Http/Controllers/Api/UmapConfigController.php b/app/Http/Controllers/Api/UmapConfigController.php
+index bf18f6b..6a901c3 100644
+--- a/app/Http/Controllers/Api/UmapConfigController.php
++++ b/app/Http/Controllers/Api/UmapConfigController.php
+@@ -11,7 +11,6 @@ class UmapConfigController extends Controller
+     public function update(Request $request, UmapService $umapService)
+     {
+         $validated = $request->validate([
+-            'nComponents' => 'required|integer|min:2|max:3',
+             'nNeighbors' => 'required|integer|min:2|max:200',
+             'minDist' => 'required|numeric|min:0|max:1',
+             'randomState' => 'required|integer|min:0',
+@@ -20,7 +19,7 @@ public function update(Request $request, UmapService $umapService)
+         try {
+             $umapService->recomputeAll(
+                 null,
+-                $validated['nComponents'],
++                2,
+                 $validated['nNeighbors'],
+                 $validated['minDist'],
+                 $validated['randomState']
+diff --git a/app/Services/UmapService.php b/app/Services/UmapService.php
+index 1e60720..22950d1 100644
+--- a/app/Services/UmapService.php
++++ b/app/Services/UmapService.php
+@@ -82,6 +82,9 @@ public function recomputeAll(
+     ): void {
+         $batchTag = $batchTag ?? ('v' . now()->format('Ymd_His'));
+ 
++        // Selalu 2D untuk visualisasi; abaikan input nComponents lain.
++        $nComponents = 2;
++
+         $menteris = Menteri::with([
+             'jenisKelamin','provinsiLahir','umurKategori',
+             'partai','jabatanRangkap','dprMpr','militerPolisi',
+diff --git a/resources/js/app.js b/resources/js/app.js
+index 9f52be9..c51066c 100644
+--- a/resources/js/app.js
++++ b/resources/js/app.js
+@@ -376,6 +376,38 @@ document.addEventListener("change", (e) => {
+ 
+         // set accent buat css dock putih + border warna
+         dockLeft.style.setProperty("--dock-accent", color);
++        const isMobile = window.innerWidth < 1024; // < lg breakpoint
++        // Tampilkan dock: di mobile sebagai overlay full, di desktop tetap di tempatnya
++        dockLeft.classList.remove("hidden");
++        dockLeft.classList.remove("dock-left--hidden");
++        if (isMobile) {
++            dockLeft.dataset.mobileActive = "1";
++            dockLeft.style.position = "fixed";
++            dockLeft.style.inset = "0";
++            dockLeft.style.zIndex = "50";
++            dockLeft.style.maxHeight = "100vh";
++            dockLeft.style.overflowY = "auto";
++            dockLeft.style.margin = "0";
++            dockLeft.style.width = "100%";
++            dockLeft.style.borderRadius = "0";
++            dockLeft.style.border = "none";
++            dockLeft.style.padding = "16px";
++            dockLeft.style.background =
++                dockLeft.style.getPropertyValue("--dock-accent") || "#00a3ff";
++        } else {
++            dockLeft.dataset.mobileActive = "0";
++            dockLeft.style.position = "";
++            dockLeft.style.inset = "";
++            dockLeft.style.zIndex = "";
++            dockLeft.style.maxHeight = "";
++            dockLeft.style.overflowY = "";
++            dockLeft.style.margin = "";
++            dockLeft.style.width = "";
++            dockLeft.style.borderRadius = "";
++            dockLeft.style.border = "";
++            dockLeft.style.padding = "";
++            dockLeft.style.background = "";
++        }
+ 
+         dockLeft.innerHTML = `
+       <div class="detail-head">
+@@ -465,9 +497,24 @@ document.addEventListener("change", (e) => {
+ 
+         // Trigger animasi dengan menambahkan class hidden
+         dockLeft.classList.add("dock-left--hidden");
++        dockLeft.classList.add("hidden");
+         layout?.classList.add("umap-layout--onecol");
+         hintLocked && (hintLocked.style.display = "none");
+ 
++        // Reset styling overlay mobile
++        dockLeft.dataset.mobileActive = "0";
++        dockLeft.style.position = "";
++        dockLeft.style.inset = "";
++        dockLeft.style.zIndex = "";
++        dockLeft.style.maxHeight = "";
++        dockLeft.style.overflowY = "";
++        dockLeft.style.margin = "";
++        dockLeft.style.width = "";
++        dockLeft.style.borderRadius = "";
++        dockLeft.style.border = "";
++        dockLeft.style.padding = "";
++        dockLeft.style.background = "";
++
+         // Reset nodes setelah animasi
+         nodes
+             .attr("fill", (n, i) => getColor(n, i))
+@@ -574,13 +621,30 @@ document.addEventListener("change", (e) => {
+             },
+         ];
+ 
++        const renderCell = (value, badge, colorHex) => `
++      <div class="compare-cell" style="display:flex;flex-direction:column;gap:6px;">
++        <span class="compare-badge" style="
++          display:inline-block;
++          align-self:flex-start;
++          padding:4px 10px;
++          border-radius:9999px;
++          background:${colorHex || "#0ea5e9"};
++          color:#fff;
++          font-weight:700;
++          font-size:.72rem;
++          letter-spacing:0.02em;
++        ">${badge}</span>
++        <div class="compare-value">${disp(value)}</div>
++      </div>
++    `;
++
+         // Desktop: 3-column layout (left | label | right)
+         const rowsDesktop = fields
+             .map(
+                 (f) => `
+-      <div class="compare-cell">${disp(f.a)}</div>
++      ${renderCell(f.a, "Menteri 1", leftColor)}
+       <div class="compare-label">${f.label}</div>
+-      <div class="compare-cell">${disp(f.b)}</div>
++      ${renderCell(f.b, "Menteri 2", rightColor)}
+     `
+             )
+             .join("");
+@@ -592,8 +656,8 @@ document.addEventListener("change", (e) => {
+       <div class="compare-field-mobile">
+         <div class="compare-label">${f.label}</div>
+         <div class="compare-values-mobile">
+-          <div class="compare-cell compare-cell-left">${disp(f.a)}</div>
+-          <div class="compare-cell compare-cell-right">${disp(f.b)}</div>
++          ${renderCell(f.a, "Menteri 1", leftColor)}
++          ${renderCell(f.b, "Menteri 2", rightColor)}
+         </div>
+       </div>
+     `
+@@ -681,7 +745,7 @@ document.addEventListener("change", (e) => {
+         dockCompare?.classList.add("dock-compare--hidden");
+ 
+         if (btnCompare) {
+-            btnCompare.textContent = "Bandingkan Menteri";
++            btnCompare.textContent = "Bandingkan";
+             btnCompare.classList.remove("bg-green-500");
+             btnCompare.classList.add("bg-primary");
+         }
+@@ -703,18 +767,7 @@ document.addEventListener("change", (e) => {
+         .attr("r", 5)
+         .attr("fill", (d, i) => getColor(d, i))
+         .attr("opacity", 0.9)
+-        .style("cursor", "pointer")
+-        // Mark user input data dengan class dot-user
+-        .classed("dot-user", (d) => {
+-            // Check berbagai kemungkinan flag untuk user input
+-            return (
+-                d.is_user_input === true ||
+-                d.is_user_input === 1 ||
+-                d.source === "user" ||
+-                d.submitted_by_ip !== null ||
+-                d.user_id !== null
+-            );
+-        });
++        .style("cursor", "pointer");
+ 
+     nodes
+         .on("mouseenter", function (event, d) {
+@@ -811,6 +864,9 @@ document.addEventListener("change", (e) => {
+             closeDetailDock();
+         }
+     });
++
++    // Default: dock detail tersembunyi sampai user klik titik
++    closeDetailDock();
+ })();
+ 
+ /* =========================================================
+@@ -852,233 +908,3 @@ document.addEventListener("keydown", (e) => {
+         });
+     }
+ });
+-
+-/* =========================================================
+-   TOAST NOTIFICATION FUNCTIONS
+-========================================================= */
+-function createToastContainer() {
+-    let container = document.getElementById("toast-container");
+-    if (!container) {
+-        container = document.createElement("div");
+-        container.id = "toast-container";
+-        container.className = "toast-container";
+-        document.body.appendChild(container);
+-    }
+-    return container;
+-}
+-
+-function showToast(type, title, message, duration = 5000) {
+-    const container = createToastContainer();
+-
+-    const toast = document.createElement("div");
+-    toast.className = `toast toast-${type}`;
+-
+-    const iconSvg =
+-        type === "success"
+-            ? '<svg class="toast-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>'
+-            : '<svg class="toast-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+-
+-    toast.innerHTML = `
+-    ${iconSvg}
+-    <div class="toast-content">
+-      <div class="toast-title">${title}</div>
+-      <div class="toast-message">${message}</div>
+-    </div>
+-    <button class="toast-close" onclick="this.parentElement.remove()">
+-      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+-      </svg>
+-    </button>
+-  `;
+-
+-    container.appendChild(toast);
+-
+-    // Auto remove setelah duration
+-    setTimeout(() => {
+-        toast.style.animation = "toast-slide-in 0.3s ease-out reverse";
+-        setTimeout(() => toast.remove(), 300);
+-    }, duration);
+-
+-    return toast;
+-}
+-
+-/* =========================================================
+-   FORM SUBMIT HANDLER
+-========================================================= */
+-document.addEventListener("DOMContentLoaded", function () {
+-    const formAddData = document.getElementById("formAddData");
+-    if (!formAddData) return;
+-
+-    formAddData.addEventListener("submit", async function (e) {
+-        e.preventDefault();
+-
+-        const submitBtn = formAddData.querySelector('button[type="submit"]');
+-        const originalText = submitBtn.innerHTML;
+-
+-        // Disable button dan show loading
+-        submitBtn.disabled = true;
+-        submitBtn.innerHTML = `
+-      <svg class="animate-spin w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+-      </svg>
+-      Menyimpan...
+-    `;
+-
+-        try {
+-            const formData = new FormData(formAddData);
+-
+-            const response = await fetch(formAddData.action, {
+-                method: "POST",
+-                body: formData,
+-                headers: {
+-                    "X-Requested-With": "XMLHttpRequest",
+-                },
+-            });
+-
+-            if (response.ok) {
+-                const result = await response.json().catch(() => null);
+-
+-                // Success toast
+-                showToast(
+-                    "success",
+-                    "Berhasil!",
+-                    result?.message ||
+-                        "Data berhasil ditambahkan dan UMAP sudah diperbarui.",
+-                    6000
+-                );
+-
+-                // Close modal
+-                window.closeModal("modalAddData");
+-
+-                // Reset form
+-                formAddData.reset();
+-
+-                // Reload page setelah 1.5 detik untuk refresh data
+-                setTimeout(() => {
+-                    window.location.reload();
+-                }, 1500);
+-            } else {
+-                // Handle error response
+-                let errorMessage = "Gagal menyimpan data. Silakan coba lagi.";
+-
+-                try {
+-                    const errorData = await response.json();
+-                    if (errorData.message) {
+-                        errorMessage = errorData.message;
+-                    } else if (errorData.errors) {
+-                        const firstError = Object.values(errorData.errors)[0];
+-                        errorMessage = Array.isArray(firstError)
+-                            ? firstError[0]
+-                            : firstError;
+-                    }
+-                } catch (e) {
+-                    // Jika response bukan JSON, gunakan status text
+-                    errorMessage = response.statusText || errorMessage;
+-                }
+-
+-                showToast("error", "Gagal!", errorMessage, 7000);
+-
+-                // Re-enable button
+-                submitBtn.disabled = false;
+-                submitBtn.innerHTML = originalText;
+-            }
+-        } catch (error) {
+-            console.error("Form submit error:", error);
+-            showToast(
+-                "error",
+-                "Error!",
+-                "Terjadi kesalahan saat menyimpan data. Periksa koneksi internet Anda.",
+-                7000
+-            );
+-
+-            // Re-enable button
+-            submitBtn.disabled = false;
+-            submitBtn.innerHTML = originalText;
+-        }
+-    });
+-
+-    // ===== UMAP CONFIG FORM HANDLER =====
+-    const formUmapConfig = document.getElementById("formUmapConfig");
+-    if (formUmapConfig) {
+-        formUmapConfig.addEventListener("submit", async function (e) {
+-            e.preventDefault();
+-
+-            const submitBtn = formUmapConfig.querySelector(
+-                'button[type="submit"]'
+-            );
+-            const originalText = submitBtn.innerHTML;
+-
+-            // Disable button dan show loading
+-            submitBtn.disabled = true;
+-            submitBtn.innerHTML = `
+-                <svg class="animate-spin w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+-                </svg>
+-                Memproses...
+-            `;
+-
+-            try {
+-                const formData = new FormData(formUmapConfig);
+-                const params = {
+-                    nComponents: parseInt(formData.get("nComponents")),
+-                    nNeighbors: parseInt(formData.get("nNeighbors")),
+-                    minDist: parseFloat(formData.get("minDist")),
+-                    randomState: parseInt(formData.get("randomState")),
+-                };
+-
+-                // Get CSRF token
+-                const csrfToken =
+-                    document
+-                        .querySelector('meta[name="csrf-token"]')
+-                        ?.getAttribute("content") || "";
+-
+-                const response = await fetch("/api/umap/update-config", {
+-                    method: "POST",
+-                    headers: {
+-                        "Content-Type": "application/json",
+-                        "X-CSRF-TOKEN": csrfToken,
+-                        "X-Requested-With": "XMLHttpRequest",
+-                    },
+-                    body: JSON.stringify(params),
+-                });
+-
+-                const result = await response.json();
+-
+-                if (response.ok && result.success) {
+-                    showToast(
+-                        "success",
+-                        "Berhasil!",
+-                        result.message ||
+-                            "UMAP berhasil di-recompute dengan parameter baru.",
+-                        5000
+-                    );
+-                    window.closeModal("modalUmapConfig");
+-
+-                    // Reload page setelah 2 detik untuk refresh data
+-                    setTimeout(() => {
+-                        window.location.reload();
+-                    }, 2000);
+-                } else {
+-                    showToast(
+-                        "error",
+-                        "Gagal!",
+-                        result.message || "Gagal update parameter UMAP",
+-                        7000
+-                    );
+-                    submitBtn.disabled = false;
+-                    submitBtn.innerHTML = originalText;
+-                }
+-            } catch (error) {
+-                console.error("UMAP config error:", error);
+-                showToast(
+-                    "error",
+-                    "Error!",
+-                    "Terjadi kesalahan saat update parameter. Periksa koneksi internet Anda.",
+-                    7000
+-                );
+-                submitBtn.disabled = false;
+-                submitBtn.innerHTML = originalText;
+-            }
+-        });
+-    }
+-});
+diff --git a/resources/views/home.blade.php b/resources/views/home.blade.php
+index 370bff5..29533d0 100644
+--- a/resources/views/home.blade.php
++++ b/resources/views/home.blade.php
+@@ -47,7 +47,7 @@ class="dock-left hidden lg:block sticky top-[92px] h-[calc(100vh-190px)] overflo
+                     <div class="block h-1.5 rounded-full bg-white/85 mb-2.5 opacity-90"></div>
+                     {{-- JS akan isi semua field ke sini --}}
+                     <div class="flex justify-between items-center mb-3 sm:mb-4 flex-wrap gap-2">
+-                        <div class="font-bold text-sm sm:text-base md:text-lg">Detail Menteri</div>
++                        <div class="font-bold text-sm sm:text-base md:text-lg"></div>
+                         <button id="btnCloseDetail"
+                             class="rounded-full bg-white text-text border-[1.5px] border-stroke px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold no-underline whitespace-nowrap transition-all duration-200 inline-flex items-center justify-center cursor-pointer gap-1.5 shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 hover:border-primary hover:text-primary hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] active:translate-y-0"
+                             type="button">
+@@ -469,14 +469,8 @@ class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-200 t
+                 {{-- Form --}}
+                 <form id="formUmapConfig" class="px-5 sm:px-6 py-5 sm:py-6">
+                     <div class="space-y-4">
+-                        <div>
+-                            <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
+-                                nComponents <span class="text-red-500">*</span>
+-                            </label>
+-                            <input type="number" name="nComponents" value="2" min="2" max="3"
+-                                required
+-                                class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+-                            <p class="text-xs text-gray-500 mt-1">Dimensi output (2 atau 3)</p>
++                        <div class="p-3 rounded-lg bg-gray-50 border border-gray-200 text-sm text-gray-700">
++                            Dimensi visualisasi dikunci ke 2D (n_components = 2) untuk tampilan peta yang konsisten.
+                         </div>
+ 
+                         <div>
+@@ -486,7 +480,12 @@ class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 b
+                             <input type="number" name="nNeighbors" value="10" min="2" max="200"
+                                 required
+                                 class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+-                            <p class="text-xs text-gray-500 mt-1">Jumlah tetangga untuk local structure (2-200)</p>
++                            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
++                                n_neighbors (Mengatur “Skala Struktur”):
++                                <br>5–15 = Memisahkan “Elite Bisnis”, “Legislator Senior”, “Teknokrat Nonpartai”, dsb
++                                <br>20–50 = Menangkap pola besar kabinet (misal: dominasi nonpartai)
++                                <br>80–150 = Menunjukkan hubungan antar kluster
++                            </p>
+                         </div>
+ 
+                         <div>
+@@ -496,8 +495,12 @@ class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 b
+                             <input type="number" name="minDist" value="0.1" min="0" max="1"
+                                 step="0.1" required
+                                 class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+-                            <p class="text-xs text-gray-500 mt-1">Jarak minimum antar titik (0.0-1.0, lebih kecil = lebih
+-                                rapat)</p>
++                            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
++                                min_dist (Seberapa Dekat Titik Boleh Menggumpal):
++                                <br>0.0–0.1 = Identitas tipologi tajam (mis. Legislator Senior vs Elite Bisnis)
++                                <br>0.3–0.5 = Spasi visual antar-titik agar mudah dibaca
++                                <br>0.6–0.9 = Menunjukkan transisi/gradien posisi (mis. teknokrat → elite bisnis)
++                            </p>
+                         </div>
+ 
+                         <div>
+@@ -506,8 +509,11 @@ class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 b
+                             </label>
+                             <input type="number" name="randomState" value="42" min="0" required
+                                 class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+-                            <p class="text-xs text-gray-500 mt-1">Seed untuk random generator (0 atau lebih, untuk hasil
+-                                konsisten)</p>
++                            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
++                                Seed untuk random generator (0 atau lebih). Default 42 untuk hasil konsisten;
++                                ubah hanya jika ingin variasi. spread + random_state mengatur bentuk & stabilitas
++                                visualisasi.
++                            </p>
+                         </div>
+                     </div>
+ 
+diff --git a/resources/views/layouts/app.blade.php b/resources/views/layouts/app.blade.php
+index a8bfb37..70f9b71 100644
+--- a/resources/views/layouts/app.blade.php
++++ b/resources/views/layouts/app.blade.php
+@@ -11,18 +11,6 @@
+ 
+ <body>
+ 
+-    <nav class="w-full px-2 sm:px-3 py-1 sm:py-2 bg-transparent">
+-        <div class="w-full flex items-center justify-between">
+-            <a class="font-bold text-[clamp(0.9rem,2.5vw,1.1rem)] no-underline" href="{{ route('home') }}">
+-                <span style="color:var(--accent2)">UMAP</span> <span class="hidden sm:inline">Menteri</span>
+-            </a>
+-            <div class="flex gap-2 ml-auto">
+-                {{-- <a class="text-sm px-3 py-1.5 rounded-full border border-white/30 text-white hover:bg-white/10 transition" href="{{ route('compare') }}">Bandingkan</a>
+-      <a class="text-sm px-3 py-1.5 rounded-full bg-white text-gray-900 hover:bg-gray-100 transition" href="{{ route('menteri.create') }}">Tambah Data</a> --}}
+-            </div>
+-        </div>
+-    </nav>
+-
+     <main class="w-full px-2 sm:px-3 lg:px-4 pb-4 sm:pb-5">
+         @yield('content')
+     </main>
+diff --git a/storage/umap/run-umap.js b/storage/umap/run-umap.js
+index 4e7d94e..9f570cc 100644
+--- a/storage/umap/run-umap.js
++++ b/storage/umap/run-umap.js
+@@ -10,11 +10,12 @@ const rows = JSON.parse(fs.readFileSync(inputPath, "utf8"));
+ const features = rows.map((r) => r.features);
+ 
+ // Parameter UMAP dari command line (opsional, default seperti sebelumnya)
+-// Format: node run-umap.js input.json output.json nComponents nNeighbors minDist randomState
+-const nComponents = parseInt(process.argv[4]) || 2;
+-const nNeighbors = parseInt(process.argv[5]) || 10;
+-const minDist = parseFloat(process.argv[6]) || 0.1;
+-const randomState = parseInt(process.argv[7]) || 42;
++// Format: node run-umap.js input.json output.json nNeighbors minDist randomState
++// Dimensi kita kunci ke 2D untuk visualisasi.
++const nComponents = 2;
++const nNeighbors = parseInt(process.argv[4]) || 10;
++const minDist = parseFloat(process.argv[5]) || 0.1;
++const randomState = parseInt(process.argv[6]) || 42;
+ 
+ // Config UMAP dengan parameter dinamis
+ const umap = new UMAP({
