@@ -47,7 +47,7 @@
                     <div class="block h-1.5 rounded-full bg-white/85 mb-2.5 opacity-90"></div>
                     {{-- JS akan isi semua field ke sini --}}
                     <div class="flex justify-between items-center mb-3 sm:mb-4 flex-wrap gap-2">
-                        <div class="font-bold text-sm sm:text-base md:text-lg">Detail Menteri</div>
+                        <div class="font-bold text-sm sm:text-base md:text-lg"></div>
                         <button id="btnCloseDetail"
                             class="rounded-full bg-white text-text border-[1.5px] border-stroke px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold no-underline whitespace-nowrap transition-all duration-200 inline-flex items-center justify-center cursor-pointer gap-1.5 shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 hover:border-primary hover:text-primary hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] active:translate-y-0"
                             type="button">

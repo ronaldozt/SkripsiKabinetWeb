@@ -800,6 +800,9 @@ document.addEventListener("change", (e) => {
             closeDetailDock();
         }
     });
+
+    // Default: dock detail tersembunyi sampai user klik titik
+    closeDetailDock();
 })();
 
 /* =========================================================
