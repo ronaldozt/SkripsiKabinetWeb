@@ -22,7 +22,7 @@ class UmapService
     protected function getNodePath(): string
     {
         // Langsung return path yang sudah pasti
-        $nodePath = '/home/u941929935/.nvm/versions/node/v18.20.4/bin/node';
+        $nodePath = 'C:\Program Files\nodejs\node.exe';
         
         if (file_exists($nodePath) && is_executable($nodePath)) {
             return $nodePath;
@@ -30,7 +30,7 @@ class UmapService
         
         // Jika path di atas tidak ada, coba fallback
         $fallbacks = [
-            '/usr/bin/node',
+            'C:\nvm4w\nodejs\node.exe',
             '/usr/local/bin/node',
         ];
         
