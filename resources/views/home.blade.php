@@ -241,20 +241,61 @@
                                         <div id="master-jk" class="flex gap-2 sm:gap-3 flex-wrap items-start"></div>
                                     </div>
 
-                                    {{-- Provinsi Lahir --}}
+                                    {{-- Provinsi Lahir (Master) --}}
                                     <div class="sm:col-span-1">
                                         <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
-                                            Provinsi Lahir <span class="text-red-500">*</span>
+                                            Provinsi Lahir (Master) <span class="text-red-500">*</span>
                                         </label>
                                         <select id="master-provinsi-lahir" name="provinsi_lahir_id"
                                             class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
                                             required></select>
                                     </div>
 
-                                    {{-- Umur --}}
+                                    {{-- Tempat Lahir (Detail) --}}
                                     <div class="sm:col-span-1">
                                         <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
-                                            Kategori Umur <span class="text-red-500">*</span>
+                                            Tempat Lahir (Detail)
+                                        </label>
+                                        <input type="text" name="tempat_lahir"
+                                            class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder-gray-400"
+                                            placeholder="Contoh: Majalengka, Jawa Barat">
+                                        <p class="text-xs text-gray-500 mt-1">Boleh kosong. Jika kosong akan pakai provinsi
+                                            lahir.</p>
+                                    </div>
+
+                                    {{-- Tanggal Lahir (Detail) --}}
+                                    <div class="sm:col-span-1">
+                                        <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
+                                            Tanggal Lahir (Detail)
+                                        </label>
+                                        <div class="relative">
+                                            <input type="text" name="tanggal_lahir" id="tanggal_lahir_input"
+                                                class="text-sm sm:text-base w-full px-4 py-3 pr-10 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder-gray-400"
+                                                placeholder="dd/mm/yyyy" readonly>
+                                            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                </path>
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    {{-- Umur (Tahun) - Detail --}}
+                                    <div class="sm:col-span-1">
+                                        <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
+                                            Umur (Tahun) - Detail
+                                        </label>
+                                        <input type="number" name="umur_tahun"
+                                            class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder-gray-400"
+                                            placeholder="Contoh: 54">
+                                        <p class="text-xs text-gray-500 mt-1">Opsional, boleh kosong.</p>
+                                    </div>
+
+                                    {{-- Kategori Umur (Master) --}}
+                                    <div class="sm:col-span-1">
+                                        <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
+                                            Kategori Umur (Master) <span class="text-red-500">*</span>
                                         </label>
                                         <select id="master-umur" name="umur_kategori_id"
                                             class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
@@ -331,38 +372,85 @@
                                             required></select>
                                     </div>
 
-                                    {{-- Lokasi SMA --}}
+                                    {{-- Almamater & Lokasi --}}
+                                    <div class="sm:col-span-2">
+                                        <h4
+                                            class="text-xs sm:text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+                                            Almamater & Lokasi</h4>
+                                    </div>
+
+                                    {{-- Almamater SMA (Detail) --}}
                                     <div class="sm:col-span-1">
                                         <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
-                                            Lokasi SMA <span class="text-red-500">*</span>
+                                            Almamater SMA (Detail)
+                                        </label>
+                                        <input type="text" name="almamater_sma"
+                                            class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder-gray-400"
+                                            placeholder="Contoh: SMAN 1 Majalengka">
+                                    </div>
+
+                                    {{-- Lokasi SMA (Master) --}}
+                                    <div class="sm:col-span-1">
+                                        <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
+                                            Lokasi SMA (Master) <span class="text-red-500">*</span>
                                         </label>
                                         <select id="master-lokasi-sma" name="lokasi_sma_id"
                                             class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
                                             required></select>
                                     </div>
 
-                                    {{-- Lokasi S1 --}}
+                                    {{-- Almamater S1 (Detail) --}}
                                     <div class="sm:col-span-1">
                                         <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
-                                            Lokasi S1 <span class="text-red-500">*</span>
+                                            Almamater S1 (Detail)
+                                        </label>
+                                        <input type="text" name="almamater_s1"
+                                            class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder-gray-400"
+                                            placeholder="Contoh: IPB / UI / UGM">
+                                    </div>
+
+                                    {{-- Lokasi S1 (Master) --}}
+                                    <div class="sm:col-span-1">
+                                        <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
+                                            Lokasi S1 (Master) <span class="text-red-500">*</span>
                                         </label>
                                         <select id="master-lokasi-s1" name="lokasi_s1_id"
                                             class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
                                             required></select>
                                     </div>
 
-                                    {{-- Lokasi S2 --}}
+                                    {{-- Almamater S2 (Detail) --}}
+                                    <div class="sm:col-span-1">
+                                        <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
+                                            Almamater S2 (Detail)
+                                        </label>
+                                        <input type="text" name="almamater_s2"
+                                            class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder-gray-400"
+                                            placeholder="Opsional">
+                                    </div>
+
+                                    {{-- Lokasi S2 (Master) --}}
                                     <div class="sm:col-span-1">
                                         <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">Lokasi
-                                            S2</label>
+                                            S2 (Master)</label>
                                         <select id="master-lokasi-s2" name="lokasi_s2_id"
                                             class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"></select>
                                     </div>
 
-                                    {{-- Lokasi S3 --}}
+                                    {{-- Almamater S3 (Detail) --}}
+                                    <div class="sm:col-span-1">
+                                        <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
+                                            Almamater S3 (Detail)
+                                        </label>
+                                        <input type="text" name="almamater_s3"
+                                            class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder-gray-400"
+                                            placeholder="Opsional">
+                                    </div>
+
+                                    {{-- Lokasi S3 (Master) --}}
                                     <div class="sm:col-span-1">
                                         <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">Lokasi
-                                            S3</label>
+                                            S3 (Master)</label>
                                         <select id="master-lokasi-s3" name="lokasi_s3_id"
                                             class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"></select>
                                     </div>
@@ -370,7 +458,7 @@
                                     {{-- Pendidikan S1 --}}
                                     <div class="sm:col-span-1">
                                         <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
-                                            Jurusan / Bidang S1 <span class="text-red-500">*</span>
+                                            Pendidikan & Level / Jurusan / Bidang S1 <span class="text-red-500">*</span>
                                         </label>
                                         <select id="master-pendidikan-s1" name="pendidikan_s1_id"
                                             class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
@@ -380,8 +468,7 @@
                                     {{-- Pendidikan S2/S3 --}}
                                     <div class="sm:col-span-1">
                                         <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">Jurusan
-                                            S2 /
-                                            S3</label>
+                                            S2 / S3</label>
                                         <select id="master-pendidikan-s2s3" name="pendidikan_s2s3_id"
                                             class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"></select>
                                     </div>
@@ -413,6 +500,37 @@
                                         <select id="master-harta" name="harta_level_id"
                                             class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
                                             required></select>
+                                    </div>
+
+                                    {{-- Kekayaan (Rp) - Detail --}}
+                                    <div class="sm:col-span-1">
+                                        <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
+                                            Kekayaan (Rp) - Detail
+                                        </label>
+                                        <input type="text" name="kekayaan_rp"
+                                            class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder-gray-400"
+                                            placeholder="Contoh: 9022400000">
+                                        <p class="text-xs text-gray-500 mt-1">Opsional. Isi angka tanpa titik/koma.</p>
+                                    </div>
+
+                                    {{-- Status Hukum - Detail --}}
+                                    <div class="sm:col-span-1">
+                                        <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
+                                            Status Hukum - Detail
+                                        </label>
+                                        <input type="text" name="status_hukum"
+                                            class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder-gray-400"
+                                            placeholder="Contoh: Terperiksa/Saksi">
+                                    </div>
+
+                                    {{-- Jabatan (opsional) --}}
+                                    <div class="sm:col-span-1">
+                                        <label class="font-semibold text-sm sm:text-base mb-2 block text-gray-700">
+                                            Jabatan (opsional)
+                                        </label>
+                                        <input type="text" name="jabatan"
+                                            class="text-sm sm:text-base w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder-gray-400"
+                                            placeholder="Contoh: Kepala Badan Gizi Nasional">
                                     </div>
                                 </div>
                             </div>
