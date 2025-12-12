@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 use App\Models\Menteri;
+use App\Models\DetailMenteri;
 use App\Models\MasterProvinsi;
 use App\Models\MasterPendidikan;
 use App\Services\UmapService;
@@ -45,6 +46,18 @@ class MenteriController extends Controller
             'harta_level_id'     => ['required','integer'],
 
             'pernah_menteri'     => ['required','in:0,1'],
+
+            // Detail fields (optional)
+            'tempat_lahir'       => ['nullable','string','max:255'],
+            'tanggal_lahir'      => ['nullable','date'],
+            'umur_tahun'         => ['nullable','integer','min:0','max:150'],
+            'almamater_sma'      => ['nullable','string','max:255'],
+            'almamater_s1'       => ['nullable','string','max:255'],
+            'almamater_s2'       => ['nullable','string','max:255'],
+            'almamater_s3'       => ['nullable','string','max:255'],
+            'kekayaan_rp'        => ['nullable','string'], // akan di-parse jadi integer
+            'status_hukum'        => ['nullable','string','max:255'],
+            'jabatan'            => ['nullable','string','max:255'], // akan masuk ke catatan
         ]);
 
         // ========= FOTO HANDLER =========
@@ -117,6 +130,51 @@ class MenteriController extends Controller
             // ✅ publik langsung masuk approved
             'status'             => 'approved',
             'submitted_by_ip'    => $request->ip(),
+        ]);
+
+        // ========= INSERT DETAIL =========
+        // Parse tanggal lahir dari dd/mm/yyyy ke Y-m-d
+        $tanggalLahir = null;
+        if (!empty($validated['tanggal_lahir'])) {
+            try {
+                // Coba parse berbagai format
+                $dateStr = $validated['tanggal_lahir'];
+                if (preg_match('/^(\d{2})\/(\d{2})\/(\d{4})$/', $dateStr, $matches)) {
+                    // Format dd/mm/yyyy
+                    $tanggalLahir = \Carbon\Carbon::createFromFormat('d/m/Y', $dateStr)->format('Y-m-d');
+                } else {
+                    // Coba parse dengan Carbon langsung
+                    $tanggalLahir = \Carbon\Carbon::parse($dateStr)->format('Y-m-d');
+                }
+            } catch (\Throwable $e) {
+                \Log::warning("Gagal parse tanggal lahir: {$validated['tanggal_lahir']}");
+            }
+        }
+
+        // Parse kekayaan dari string ke integer (hapus titik/koma)
+        $kekayaanRp = null;
+        if (!empty($validated['kekayaan_rp'])) {
+            $kekayaanRp = (int) preg_replace('/\D+/', '', $validated['kekayaan_rp']);
+        }
+
+        // Gabungkan jabatan ke catatan jika ada
+        $catatan = null;
+        if (!empty($validated['jabatan'])) {
+            $catatan = trim($validated['jabatan']);
+        }
+
+        DetailMenteri::create([
+            'menteri_id'     => $menteri->id,
+            'tempat_lahir'   => $validated['tempat_lahir'] ?? null,
+            'tanggal_lahir'  => $tanggalLahir,
+            'umur_tahun'     => $validated['umur_tahun'] ?? null,
+            'almamater_sma'  => $validated['almamater_sma'] ?? null,
+            'almamater_s1'   => $validated['almamater_s1'] ?? null,
+            'almamater_s2'   => $validated['almamater_s2'] ?? null,
+            'almamater_s3'   => $validated['almamater_s3'] ?? null,
+            'kekayaan_rp'    => $kekayaanRp,
+            'status_hukum'   => $validated['status_hukum'] ?? null,
+            'catatan'        => $catatan,
         ]);
 
         // ========= RECOMPUTE FULL =========

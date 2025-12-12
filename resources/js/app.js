@@ -1,4 +1,6 @@
 import * as d3 from "d3";
+import flatpickr from "flatpickr";
+import "flatpickr/dist/flatpickr.min.css";
 import tippy from "tippy.js";
 import "tippy.js/dist/tippy.css";
 
@@ -163,6 +165,112 @@ document.addEventListener("change", (e) => {
         urlWrap.classList.remove("hidden");
     }
 });
+
+// ===== DATE PICKER SETUP =====
+let tanggalLahirPicker = null;
+
+function initDatePicker() {
+    const tanggalLahirInput = document.getElementById("tanggal_lahir_input");
+    if (tanggalLahirInput && !tanggalLahirPicker) {
+        tanggalLahirPicker = flatpickr(tanggalLahirInput, {
+            dateFormat: "d/m/Y",
+            locale: {
+                firstDayOfWeek: 1,
+                weekdays: {
+                    shorthand: [
+                        "Min",
+                        "Sen",
+                        "Sel",
+                        "Rab",
+                        "Kam",
+                        "Jum",
+                        "Sab",
+                    ],
+                    longhand: [
+                        "Minggu",
+                        "Senin",
+                        "Selasa",
+                        "Rabu",
+                        "Kamis",
+                        "Jumat",
+                        "Sabtu",
+                    ],
+                },
+                months: {
+                    shorthand: [
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "Mei",
+                        "Jun",
+                        "Jul",
+                        "Agu",
+                        "Sep",
+                        "Okt",
+                        "Nov",
+                        "Des",
+                    ],
+                    longhand: [
+                        "Januari",
+                        "Februari",
+                        "Maret",
+                        "April",
+                        "Mei",
+                        "Juni",
+                        "Juli",
+                        "Agustus",
+                        "September",
+                        "Oktober",
+                        "November",
+                        "Desember",
+                    ],
+                },
+            },
+            allowInput: true,
+            clickOpens: true,
+            defaultDate: null,
+            maxDate: "today",
+        });
+    }
+}
+
+// Initialize saat DOM ready
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(initDatePicker, 100);
+    });
+} else {
+    setTimeout(initDatePicker, 100);
+}
+
+// Re-initialize saat modal dibuka
+const modalAddData = document.getElementById("modalAddData");
+if (modalAddData) {
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (
+                mutation.type === "attributes" &&
+                mutation.attributeName === "class"
+            ) {
+                const isHidden = modalAddData.classList.contains("hidden");
+                if (!isHidden) {
+                    setTimeout(() => {
+                        if (tanggalLahirPicker) {
+                            tanggalLahirPicker.destroy();
+                            tanggalLahirPicker = null;
+                        }
+                        initDatePicker();
+                    }, 100);
+                }
+            }
+        });
+    });
+    observer.observe(modalAddData, {
+        attributes: true,
+        attributeFilter: ["class"],
+    });
+}
 
 /* =========================================================
    UMAP + DETAIL + COMPARE ONEPAGE
