@@ -133,23 +133,14 @@ class UmapService
         $nodeBin = $this->getNodePath();
         $scriptPath = base_path('storage/umap/run-umap.js');
 
-        // nComponents tidak dikirim karena sudah di-hardcode ke 2 di run-umap.js
-        // Urutan argument: inputPath, outputPath, nNeighbors, minDist, randomState
         $cmd = escapeshellarg($nodeBin)
             . ' ' . escapeshellarg($scriptPath)
             . ' ' . escapeshellarg($inputPath)
             . ' ' . escapeshellarg($outputPath)
+            . ' ' . escapeshellarg((string)$nComponents)
             . ' ' . escapeshellarg((string)$nNeighbors)
             . ' ' . escapeshellarg((string)$minDist)
             . ' ' . escapeshellarg((string)$randomState);
-
-        // Log parameter yang dikirim untuk debugging
-        \Log::info("UMAP recompute parameters", [
-            'nNeighbors' => $nNeighbors,
-            'minDist' => $minDist,
-            'randomState' => $randomState,
-            'batchTag' => $batchTag,
-        ]);
 
         $descriptorspec = [
             0 => ["pipe", "r"],
@@ -176,14 +167,6 @@ class UmapService
         fclose($pipes[2]);
 
         $code = proc_close($process);
-
-        // Log output dari Node.js untuk debugging (termasuk parameter yang digunakan)
-        if (!empty($stdout)) {
-            \Log::info("UMAP Node.js stdout", ['output' => trim($stdout)]);
-        }
-        if (!empty($stderr)) {
-            \Log::warning("UMAP Node.js stderr", ['output' => trim($stderr)]);
-        }
 
         if ($code !== 0) {
             $out = array_filter(explode("\n", trim($stdout . "\n" . $stderr)));
